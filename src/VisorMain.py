@@ -10,9 +10,11 @@ Created on 24/02/2011
 import wx
 import VisorGUI
 
+global frame_del_visor
+
 if __name__ == '__main__':
     print (u"Hola Mundo!!")
-    print (u"Usaré PIL (Python Image Library) y wxPython para hacer este programa :)")
+    print (u"Usaré PIL (Python Imageing Library) y wxPython para hacer este programa :)")
     
     app = wx.PySimpleApp(0)
     wx.InitAllImageHandlers()

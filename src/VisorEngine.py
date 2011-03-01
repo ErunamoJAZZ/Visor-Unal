@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 '''
 Created on 28/02/2011
 
@@ -7,21 +8,62 @@ Created on 28/02/2011
 
 import Image,wx,os
 
-global img #imagen
 
+
+
+def loadAll(_padre):
+    global padre
+    padre=_padre
+    
 def openImage(event):
+    global img
     
     dlg = wx.FileDialog(None, message="Seleccione un archivo de texto",
                                 defaultDir=os.getcwd(), defaultFile=".txt",
                                 style=wx.OPEN | wx.CHANGE_DIR )
     if dlg.ShowModal() == wx.ID_OK:
         path = dlg.GetPath()
-        Image.open( unicode( path.replace('\\','/')  )  )
+        img = Image.open( unicode( path.replace('\\','/')  )  )
         dlg.Destroy()
-
+        
+        #Aquí se carga la imagen en el GUI
+        #padre.bitmap_1= wx.StaticBitmap(padre.panel_para_img, -1, pilToBitmap( img ))
+        padre.cargarImg(pilToBitmap( img ))
 
 def saveImagen(event):
     pass
+
+
+#--Filtros
+def rgb2grises(event):
+    padre.mostrarFiltro( pilToBitmap( img.convert('L') )  )
+    
+def rgb2r(event):
+    s = img.split()
+    padre.mostrarFiltro( pilToBitmap( s[0] )  )
+    
+def rgb2g(event):
+    s = img.split()
+    padre.mostrarFiltro( pilToBitmap( s[1] )  )
+    
+def rgb2b(event):
+    s = img.split()
+    padre.mostrarFiltro( pilToBitmap( s[2] )  )
+    
+
+    
+
+    
+
+
+
+
+
+
+
+
+
+
 
 '''
 PIL Image to wx.Image.
@@ -33,7 +75,6 @@ def bitmapToPil(bitmap):
 
 def bitmapToImage(bitmap):
     return wx.ImageFromBitmap(bitmap)
-
 
 def pilToBitmap(pil):
     return imageToBitmap(pilToImage(pil))
