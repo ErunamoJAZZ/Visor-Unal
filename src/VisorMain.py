@@ -12,7 +12,7 @@ import VisorGUI
 
 if __name__ == '__main__':
     print (u"Hola Mundo!!")
-    print (u"Usaré OpenCV y wxPython para hacer este programa :)")
+    print (u"Usaré PIL (Python Image Library) y wxPython para hacer este programa :)")
     
     app = wx.PySimpleApp(0)
     wx.InitAllImageHandlers()
