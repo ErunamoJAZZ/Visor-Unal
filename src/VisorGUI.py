@@ -18,10 +18,7 @@ class FrameVisor(wx.Frame):
         self.panel_imagen1 = wx.Panel(self.notebook_imagenes, -1)
         self.panel_para_img = wx.Panel(self.panel_imagen1, -1)
         self.bitmap_1 = wx.StaticBitmap(self.panel_para_img, -1)
-        self.guardar = wx.Button(self.panel_imagen1, -1, "Guardar como...")
-        self.cerrar = wx.Button(self.panel_imagen1, -1, "cerrar")
         VisorEngine.loadAll(self)
-        
         
         # Menu Bar
         self.__barra_de_menu()
@@ -34,24 +31,21 @@ class FrameVisor(wx.Frame):
     def __set_properties(self):
         # begin wxGlade: wxFrame.__set_properties
         self.SetTitle("Visor - Carlos Daniel Sanchez Ramirez")
-        self.SetSize((400, 500))
-        self.SetMinSize((400,500))
+        self.SetSize((400, 200))
+        self.SetMinSize((400, 200))
+        self.Center()
         # end wxGlade
 
     def __do_layout(self):
         # begin wxGlade: wxFrame.__do_layout
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_para_img = wx.BoxSizer(wx.HORIZONTAL)
         sizer_para_img.Add(self.bitmap_1, 0, 0, 0)
         self.panel_para_img.SetSizer(sizer_para_img)
         sizer_2.Add(self.panel_para_img, 10, wx.EXPAND, 0)
-        sizer_3.Add(self.guardar, 0, 0, 0)
-        sizer_3.Add(self.cerrar, 0, 0, 0)
-        sizer_2.Add(sizer_3, 1, wx.EXPAND, 0)
         self.panel_imagen1.SetSizer(sizer_2)
-        self.notebook_imagenes.AddPage(self.panel_imagen1, "tab1")
+        self.notebook_imagenes.AddPage(self.panel_imagen1, "imagen")
         sizer_1.Add(self.notebook_imagenes, 1, wx.EXPAND, 0)
         self.SetSizer(sizer_1)
         sizer_1.Fit(self)
@@ -87,7 +81,13 @@ class FrameVisor(wx.Frame):
         invertir = wxglade_tmp_menu.Append(wx.NewId(), "Invertit grises", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, VisorEngine.invertir, invertir)
         umbral = wxglade_tmp_menu.Append(wx.NewId(), "Umbral", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.umbral, umbral)
+        self.Bind(wx.EVT_MENU, VisorEngine.init_umbral, umbral)
+        umbral_bin = wxglade_tmp_menu.Append(wx.NewId(), "Umbral binario", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.init_umbral_bin, umbral_bin)
+        sum = wxglade_tmp_menu.Append(wx.NewId(), "Suma/resta", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.suma, sum)
+        mult = wxglade_tmp_menu.Append(wx.NewId(), u"Multiplicación/División", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.multipli, mult)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 2")
         
         wxglade_tmp_menu = wx.Menu()
@@ -106,9 +106,11 @@ class FrameVisor(wx.Frame):
         
     def cargarImg(self, img):
         self.bitmap_1.SetBitmap(img)
+        self.SetSize(self.bitmap_1.GetSizeTuple())
+        self.Center()
         
-    def mostrarFiltro(self, imagen):
-        ImagenPopUp( imagen ).Show()
+    def mostrarFiltro(self, imagen, umbral=False):
+        ImagenPopUp( imagen, umbral ).Show()
 
 
 # end of class FrameVisor
@@ -117,7 +119,7 @@ class FrameVisor(wx.Frame):
 # Imagen de filtro #
 ####################
 class ImagenPopUp(wx.Frame):
-    def __init__(self, img):
+    def __init__(self, img, slider=False):
         '''
         img=imagen en bitmap que se mostrará en una ventana aparte.
         '''
@@ -126,11 +128,42 @@ class ImagenPopUp(wx.Frame):
                            style=wx.DEFAULT_FRAME_STYLE)
 
         self.bitmap_1 = wx.StaticBitmap(self, -1 , img)
-        self.SetMinSize( self.bitmap_1.GetSizeTuple() )
+        x,y = self.bitmap_1.GetSizeTuple()
+        self.SetMinSize( (x,y+70) )
         self.Center()
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_1.Add(self.bitmap_1, 0, 0, 0)
+        #Si se pide el slider, se pone
+        if slider:
+            self.slid= wx.Slider(self, -1, 0, 0, 255)
+            sizer_1.Add(self.slid, 0, wx.EXPAND, 0)
+            self._eventos()
+        
+        self.__barra_de_menu()
         self.SetSizer(sizer_1)
         self.Layout()
         
+    def __barra_de_menu(self):
+        # Menu Bar
+        self.frame_del_visor_menubar = wx.MenuBar()
+        wxglade_tmp_menu = wx.Menu()
+        save = wxglade_tmp_menu.Append(wx.NewId(), "Guardar", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.saveImagen, save)
+        self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Archivo")
 
+        self.SetMenuBar(self.frame_del_visor_menubar)
+        # Menu Bar end    
+    
+    def _eventos(self):
+        self.slid.Bind(wx.EVT_COMMAND_SCROLL, self._umbral)
+        
+    def _umbral(self, event):
+        '''
+        Hace los cambios en la imagen, devuelve un bitmap, y lo actualiza.
+        '''
+        self.bitmap_1.SetBitmap( VisorEngine.umbral( self.slid.GetValue() )  )
+        
+    def saveImagen(self,event):
+        self.bitmap_1
+        
+        
