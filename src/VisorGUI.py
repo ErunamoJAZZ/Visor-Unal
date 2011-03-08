@@ -82,9 +82,18 @@ class FrameVisor(wx.Frame):
         rgb = wxglade_tmp_menu.Append(wx.NewId(), "HSI -> RGB", "", wx.ITEM_NORMAL)
         
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros")
+        
+        wxglade_tmp_menu = wx.Menu()
+        invertir = wxglade_tmp_menu.Append(wx.NewId(), "Invertit grises", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, invertir)
+        umbral = wxglade_tmp_menu.Append(wx.NewId(), "Umbral", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.umbral, umbral)
+        self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 2")
+        
         wxglade_tmp_menu = wx.Menu()
         wxglade_tmp_menu.Append(wx.NewId(), "Acerca de...", "", wx.ITEM_NORMAL)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "...")
+        
         self.SetMenuBar(self.frame_del_visor_menubar)
         # Menu Bar end
 

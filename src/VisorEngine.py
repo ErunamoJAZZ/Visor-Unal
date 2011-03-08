@@ -7,6 +7,8 @@ Created on 28/02/2011
 '''
 
 import Image,wx,os
+import colorsys
+import ImageChops
 
 
 
@@ -50,24 +52,38 @@ def rgb2b(event):
     s = img.split()
     padre.mostrarFiltro( pilToBitmap( s[2] )  )
     
+def rgb2hsl(event):
+    vector = list( img.getdata() )
+    vector_out = []#Forzar lista y no tupla
+    for pixel in vector:
+        vector_out.append( colorsys.rgb_to_hls( *[ x/255.0 for x in pixel ]) )
+        
+    imagen_out= wx.EmptyImage(img.size[0], img.size[1])
+    #imagen_out.SetData( struct.pack('i'*len(vector_out)*3,  vector_out) )
 
-    
+#--Filtros 2
+def invertir(event):
+    i= ImageChops.invert( img.convert('L') )
+    padre.mostrarFiltro( pilToBitmap( i )  )
 
-    
-
-
-
-
-
-
-
+def umbral(event):
+    dlg = wx.TextEntryDialog(None, u"Introduzca el umbral de 0~255:",
+                       'Umbral',  '100')
+    if dlg.ShowModal() == wx.ID_OK:
+        try:
+            dato = int(dlg.GetValue() )
+            if dato > 255: raise ValueError
+            
+            
+        except ValueError:
+            print(u'>> Error, introduzca un número, y Válido')    
 
 
 
 
 '''
 PIL Image to wx.Image.
-from: http://wiki.wxpython.org/WorkingWithImages
+from: http://wiki.wxpython.org/WorkingWithImawx.Bitmap("/home/erunamo/Documentos/Universidad/VA/lena.jpg", wx.BITMAP_TYPE_ANY)ges
 '''
 #copy/paste para manejar imagenes PIL & wxImage
 def bitmapToPil(bitmap):
