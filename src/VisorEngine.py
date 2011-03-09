@@ -122,9 +122,9 @@ def multipli(event):
     dlg = wx.TextEntryDialog(None, u"Introduzca el valor a Multiplicar [2, ó 0.5 para dividir por 2]:", u'Multiplicación',  '')
     if dlg.ShowModal() == wx.ID_OK:
         try:
-            dato = int(dlg.GetValue() )
+            dato = float(dlg.GetValue() )
             if dato > 255: raise ValueError
-            img_out=img_gray.point(lambda i: i * dato )
+            img_out=img_gray.point(lambda i: int(i * dato )  )
             padre.mostrarFiltro( pilToBitmap( img_out )  )
             
         except ValueError:

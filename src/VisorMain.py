@@ -7,7 +7,7 @@ Created on 24/02/2011
 @web: https://github.com/ErunamoJAZZ/Visor-Unal
 '''
 
-import wx
+import wx, sys
 import VisorGUI
 
 global frame_del_visor
@@ -22,3 +22,5 @@ if __name__ == '__main__':
     app.SetTopWindow(frame_del_visor)
     frame_del_visor.Show()
     app.MainLoop()
+    
+sys.exit()
