@@ -79,6 +79,13 @@ def rgb2hsl(event):#############
         
     imagen_out= wx.EmptyImage(img.size[0], img.size[1])
     #imagen_out.SetData( struct.pack('i'*len(vector_out)*3,  vector_out) )
+    
+    im2=Image.new('HSL', img.size)
+    
+    
+    
+    
+    
 
 #--Filtros 2
 def invertir(event):
@@ -86,12 +93,21 @@ def invertir(event):
     img_out= ImageChops.invert( img.convert('L') )
     padre.mostrarFiltro( pilToBitmap( img_out )  )
 
-def init_umbral(event):
-    global def_umbral
-    def_umbral = lambda i, val_um: 0 if i < val_um else i
-    padre.mostrarFiltro( pilToBitmap( img_gray ), True  )
-
 def init_umbral_bin(event):
+    global def_umbral
+    dlg = wx.TextEntryDialog(None, u'Introduzca el valor máximo del umbral (El otro lo puede saignar dinamicamente)', u'Umbral Binario',  '')
+    if dlg.ShowModal() == wx.ID_OK:
+        try:
+            dato = int(dlg.GetValue() )
+            if 0 > dato > 255: raise ValueError
+            def_umbral = lambda i, val_um1, val_um2=dato: 0 if val_um1 < i < val_um2  else 255
+            padre.mostrarFiltro( pilToBitmap( img_gray ), True  )
+            
+        except ValueError:
+            print(u'>> Error, introduzca un número, y Válido')
+
+
+def init_umbral(event):
     global def_umbral
     def_umbral = lambda i, val_um: 0 if i < val_um else 255
     padre.mostrarFiltro( pilToBitmap( img_gray ), True  )

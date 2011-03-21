@@ -1,3 +1,7 @@
-Visor de imagenes usando Python, wxPython, y OpenCV.
+Visor de imagenes usando Python, wxPython, y PIL (Python Imaging Library).
 
 Para el curso de Visión Artificial 01-2011
+
+NOTA: Para subir al repositorio se usan los comandos:
+git commit -a
+git push -u origin master
