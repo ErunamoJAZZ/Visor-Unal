@@ -9,6 +9,8 @@ Created on 28/02/2011
 import Image,wx,os
 import colorsys
 import ImageChops
+import cv
+
 
 
 #def_umbral= lambda i, v: i
@@ -147,10 +149,83 @@ def multipli(event):
             print(u'>> Error, introduzca un número, y Válido')    
 
 
+#PARTE 3
+def histograma(event):
+    global img_out
+    img_out = img.convert('L')
+    padre.mostrarFiltro( pilToBitmap( imhist(img_out )  )   )
+
+
+
+
+
+
+
+
+
+
+
+
+
+#==============================================================
+
+'''
+Pseudo implementación de la función imhist() de matlab.
+'''
+def imhist(imgPIL):
+    '''
+    Resibe la imagen a escala de grises de tipo PIL(Python Image Library)
+    '''
+    #crear el histograma base.
+    rangos = [[0,255]]
+    hist = cv.CreateHist([256], cv.CV_HIST_ARRAY, rangos, 1)
+    
+    #pasar de pil a cv
+    src= pil2cv_L(imgPIL)
+        
+    #calculando el histograma
+    cv.CalcHist([cv.GetImage(src)] , hist, 0)
+
+    
+    def drawHistogram(histograma, scaleX=1.0, scaleY=1.0):
+        '''
+        Dibuja una imagen para el histograma calculado
+        '''
+        #rescara el numero máximo de valores en el historial.
+        (_, histMax, _, _) = cv.GetMinMaxHistValue(histograma)
+        
+        #crea la imagen base, y la pone negra.
+        imgHist= cv.CreateImage( (scaleX*256, scaleY*64) , 8, 1)
+        cv.Zero(imgHist)
+        
+        
+        #dibuja todo el histograma
+        for pix in range(0,255):
+            histValue = cv.QueryHistValue_1D(histograma, pix)
+            nextValue = cv.QueryHistValue_1D(histograma, pix+1)
+            
+            #Los puntos en python se representan como tuplas :)
+            pt1 = (pix*scaleX, 64*scaleY)
+            pt2 = (pix*scaleX+scaleX, 64*scaleY)
+            pt3 = (pix*scaleX+scaleX, (64-nextValue*64/histMax)*scaleY)
+            pt4 = (pix*scaleX, (64-histValue*64/histMax)*scaleY)
+            
+            #se hace una lista de tuplas
+            pts = [pt1, pt2, pt3, pt4]
+            
+            #se dubuja con el color 255
+            cv.FillConvexPoly(imgHist, pts, 255)
+        
+        #finalmente, se retorna la imagen(imgCV) del histograma ya dibujado.    
+        return imgHist
+    
+    return cv2pil( drawHistogram(hist,2,7) )        
+            
+#==============================================================
 
 '''
 PIL Image to wx.Image.
-from: http://wiki.wxpython.org/WorkingWithImawx.Bitmap("/home/erunamo/Documentos/Universidad/VA/lena.jpg", wx.BITMAP_TYPE_ANY)ges
+from: http://wiki.wxpython.org/WorkingWithImages
 '''
 #copy/paste para manejar imagenes PIL & wxImage
 def bitmapToPil(bitmap):
@@ -175,3 +250,16 @@ def imageToPil(image):
 def imageToBitmap(image):
     return image.ConvertToBitmap()
 #Fin del copy/paste
+
+
+'''
+PIL Image to OpenCV
+'''
+def pil2cv_L(imgPIL):
+    imgCV = cv.CreateImageHeader(imgPIL.size, cv.IPL_DEPTH_8U, 1)
+    cv.SetData(imgCV, imgPIL.tostring() )
+    return imgCV
+
+def cv2pil(imgCV):
+    imgPIL = Image.fromstring('L', cv.GetSize(imgCV), imgCV.tostring() )
+    return imgPIL

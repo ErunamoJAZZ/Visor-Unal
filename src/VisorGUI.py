@@ -30,7 +30,7 @@ class FrameVisor(wx.Frame):
 
     def __set_properties(self):
         # begin wxGlade: wxFrame.__set_properties
-        self.SetTitle("Visor - Carlos Daniel Sanchez Ramirez")
+        self.SetTitle(u"Visor - Carlos Daniel Sanchez Ramirez")
         self.SetSize((400, 200))
         self.SetMinSize((400, 200))
         self.Center()
@@ -62,6 +62,8 @@ class FrameVisor(wx.Frame):
         self.Bind(wx.EVT_MENU, self.salir, salir)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Archivo")
         
+        
+        #PARTE 1
         wxglade_tmp_menu = wx.Menu()
         gris = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> Grises", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, VisorEngine.rgb2grises, gris)
@@ -77,6 +79,8 @@ class FrameVisor(wx.Frame):
         
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros")
         
+        
+        #PARTE 2
         wxglade_tmp_menu = wx.Menu()
         invertir = wxglade_tmp_menu.Append(wx.NewId(), "Invertit grises", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, VisorEngine.invertir, invertir)
@@ -90,6 +94,32 @@ class FrameVisor(wx.Frame):
         self.Bind(wx.EVT_MENU, VisorEngine.multipli, mult)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 2")
         
+        
+        #PARTE3
+        wxglade_tmp_menu = wx.Menu()
+        histo = wxglade_tmp_menu.Append(wx.NewId(), "Histograma", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.histograma, histo)
+        histoAcum = wxglade_tmp_menu.Append(wx.NewId(), "Histograma Acumulativo", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, histoAcum)
+        #
+        media = wxglade_tmp_menu.Append(wx.NewId(), "Histograma", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, media)
+        mediana = wxglade_tmp_menu.Append(wx.NewId(), "Histograma", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, mediana)
+        gauss = wxglade_tmp_menu.Append(wx.NewId(), "Histograma", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, gauss)
+        #
+        uniforme = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Global", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, uniforme)
+        uniforme2 = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Global", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, uniforme2)
+        exponencial = wxglade_tmp_menu.Append(wx.NewId(), "Exponencial", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, exponencial)
+        rayleigh = wxglade_tmp_menu.Append(wx.NewId(), "Rayleigh", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, VisorEngine.invertir, rayleigh)
+        self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 3")
+        
+        #FIN
         wxglade_tmp_menu = wx.Menu()
         wxglade_tmp_menu.Append(wx.NewId(), "Acerca de...", "", wx.ITEM_NORMAL)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "...")
