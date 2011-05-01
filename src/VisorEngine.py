@@ -10,7 +10,7 @@ import Image,wx,os
 import colorsys
 import ImageChops
 import cv
-
+import ImageFilter
 
 
 #def_umbral= lambda i, v: i
@@ -52,25 +52,25 @@ def saveImagen(event):
 def rgb2grises(event):
     global img_out
     img_out = img.convert('L')
-    padre.mostrarFiltro( pilToBitmap( img_out )  )
+    padre.mostrarFiltro( pilToBitmap( img_out ), img_out  )
     
 def rgb2r(event):
     global img_out
     s = img.split()
     img_out = s[0]
-    padre.mostrarFiltro( pilToBitmap( s[0] )  )
+    padre.mostrarFiltro( pilToBitmap( s[0] ), img_out )
     
 def rgb2g(event):
     global img_out
     s = img.split()
     img_out = s[1]
-    padre.mostrarFiltro( pilToBitmap( s[1] )  )
+    padre.mostrarFiltro( pilToBitmap( s[1] ), img_out  )
     
 def rgb2b(event):
     global img_out
     s = img.split()
     img_out = s[2]
-    padre.mostrarFiltro( pilToBitmap( s[2] )  )
+    padre.mostrarFiltro( pilToBitmap( s[2] ), img_out  )
     
 def rgb2hsl(event):#############
     global img_out
@@ -93,7 +93,7 @@ def rgb2hsl(event):#############
 def invertir(event):
     global img_out
     img_out= ImageChops.invert( img.convert('L') )
-    padre.mostrarFiltro( pilToBitmap( img_out )  )
+    padre.mostrarFiltro( pilToBitmap( img_out ), img_out  )
 
 def init_umbral_bin(event):
     global def_umbral
@@ -103,7 +103,7 @@ def init_umbral_bin(event):
             dato = int(dlg.GetValue() )
             if 0 > dato > 255: raise ValueError
             def_umbral = lambda i, val_um1, val_um2=dato: 0 if val_um1 < i < val_um2  else 255
-            padre.mostrarFiltro( pilToBitmap( img_gray ), True  )
+            padre.mostrarFiltro( pilToBitmap( img_gray ), img_out, True  )
             
         except ValueError:
             print(u'>> Error, introduzca un número, y Válido')
@@ -112,7 +112,7 @@ def init_umbral_bin(event):
 def init_umbral(event):
     global def_umbral
     def_umbral = lambda i, val_um: 0 if i < val_um else 255
-    padre.mostrarFiltro( pilToBitmap( img_gray ), True  )
+    padre.mostrarFiltro( pilToBitmap( img_gray ), img_out, True  )
     
 def umbral(valor_umbral ):
     '''
@@ -130,7 +130,7 @@ def suma(event):
             dato = int(dlg.GetValue() )
             if dato > 255: raise ValueError
             img_out = img_gray.point(lambda i: i + dato )
-            padre.mostrarFiltro( pilToBitmap( img_out )  )
+            padre.mostrarFiltro( pilToBitmap( img_out ), img_out  )
             
         except ValueError:
             print(u'>> Error, introduzca un número, y Válido')    
@@ -143,7 +143,7 @@ def multipli(event):
             dato = float(dlg.GetValue() )
             if dato > 255: raise ValueError
             img_out=img_gray.point(lambda i: int(i * dato )  )
-            padre.mostrarFiltro( pilToBitmap( img_out )  )
+            padre.mostrarFiltro( pilToBitmap( img_out ), img_out  )
             
         except ValueError:
             print(u'>> Error, introduzca un número, y Válido')    
@@ -153,11 +153,13 @@ def multipli(event):
 def histograma(event):
     global img_out
     img_out = img.convert('L')
-    padre.mostrarFiltro( pilToBitmap( imhist(img_out )  )   )
+    padre.mostrarFiltro( pilToBitmap( imhist(img_out )  ), imhist(img_out )  )
 
 
-
-
+def median(event):
+    global img_out
+    img_out = img.filter(ImageFilter.MedianFilter())
+    padre.mostrarFiltro( pilToBitmap( img_out ), img_out )
 
 
 
@@ -172,11 +174,7 @@ def histograma(event):
 '''
 Pseudo implementación de la función imhist() de matlab.
 '''
-def imhist(imgPIL):
-    '''
-    Resibe la imagen a escala de grises de tipo PIL(Python Image Library)
-    '''
-    #crear el histograma base.
+def hist(imgPIL):
     rangos = [[0,255]]
     hist = cv.CreateHist([256], cv.CV_HIST_ARRAY, rangos, 1)
     
@@ -184,8 +182,17 @@ def imhist(imgPIL):
     src= pil2cv_L(imgPIL)
         
     #calculando el histograma
-    cv.CalcHist([cv.GetImage(src)] , hist, 0)
+    cv.CalcHist([cv.GetImage(src)] , hist, 0)  
+    
+    return hist  
+    
+def imhist(imgPIL):
+    '''
+    Resibe la imagen a escala de grises de tipo PIL(Python Image Library)
+    '''
+    #crear el histograma base.
 
+    hist = hist(imgPIL)
     
     def drawHistogram(histograma, scaleX=1.0, scaleY=1.0):
         '''
@@ -219,7 +226,7 @@ def imhist(imgPIL):
         #finalmente, se retorna la imagen(imgCV) del histograma ya dibujado.    
         return imgHist
     
-    return cv2pil( drawHistogram(hist,2,7) )        
+    return cv2pil( drawHistogram(hist,3,3) )        
             
 #==============================================================
 
