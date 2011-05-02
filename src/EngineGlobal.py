@@ -97,12 +97,14 @@ def cv2pil(imgCV):
 '''
 Pseudo implementación de la función imhist() de matlab.
 '''
-def imhist(imgPIL):
+def imhist(imgPIL, acumulativo=False):
     '''
-    imhist(imgPIL) -> (histImgPIL, histCV)
+    imhist(imgPIL) -> (histImgPIL, histCV, AvgSdv)
     Resibe una imagen tipo PIL, y retorna una Tupla.
     Donde histImPIL es la imagen del histograma,
-    y histCV es el histograma crudo que hace OpenCV.
+    histCV es el histograma crudo que hace OpenCV,
+    y AvgSdv es una tupla con el valor medio y 
+    la desviación estandar.
     '''
     
     def drawHistogram(histograma, scaleX=1.0, scaleY=1.0):
@@ -136,6 +138,51 @@ def imhist(imgPIL):
         
         #finalmente, se retorna la imagen(imgCV) del histograma ya dibujado.    
         return imgHist
+    
+    def drawHistogramAccum(histograma, scaleX=1.0, scaleY=1.0):
+        '''
+        Dibuja una imagen del histograma acumulativo calculado
+        '''
+        #rescara el numero máximo de valores en el historial.
+        #(_, histMax, _, _) = cv.GetMinMaxHistValue(histograma)
+        #Una lista con los valore del histograma acumulado
+        newHist=[]
+        acumulacion=0.0
+        for i in range(0,256):
+            acumulacion = acumulacion + cv.QueryHistValue_1D(histograma, i)
+            newHist.append(acumulacion)
+        #para obtener el tamaño máximo luego con sort
+        aux=[]
+        aux[:]= newHist[:]
+        aux.sort()
+        histMax= aux[-1]
+        
+        
+        #crea la imagen base, y la pone negra.
+        imgHist= cv.CreateImage( (scaleX*256, scaleY*64) , 8, 1)
+        cv.Zero(imgHist)
+        
+        
+        #dibuja todo el histograma
+        for pix in range(0,255):
+            histValue = newHist[pix] #(histograma, pix)
+            nextValue = newHist[pix+1]#cv.QueryHistValue_1D(histograma, pix+1)
+            
+            #Los puntos en python se representan como tuplas :)
+            pt1 = (pix*scaleX, 64*scaleY)
+            pt2 = (pix*scaleX+scaleX, 64*scaleY)
+            pt3 = (pix*scaleX+scaleX, (64-nextValue*64/histMax)*scaleY)
+            pt4 = (pix*scaleX, (64-histValue*64/histMax)*scaleY)
+            
+            #se hace una lista de tuplas
+            pts = [pt1, pt2, pt3, pt4]
+            
+            #se dubuja con el color 255
+            cv.FillConvexPoly(imgHist, pts, 255)
+        
+        #finalmente, se retorna la imagen(imgCV) del histograma ya dibujado.    
+        return imgHist
+    
     #===================
     #creación del histograma vacío (es como un array)
     rangos = [[0,255]]
@@ -148,7 +195,10 @@ def imhist(imgPIL):
     cv.CalcHist([cv.GetImage(src)] , hist, 0)  
     
     #=== FINAL ===
-    #retorna Tupla (imgPIL, histCV)
-    return (cv2pil( drawHistogram(hist,2,5) ), hist)
+    #retorna Tupla (imgPIL, histCV, AvgSdv), este ultimo, es el valor medio y la desviación estandar
+    if not acumulativo:
+        return (cv2pil( drawHistogram(hist,2,5) ), hist, cv.AvgSdv(cv.GetImage(src)))
+    else:
+        return (cv2pil( drawHistogramAccum(hist,2,5) ), hist, cv.AvgSdv(cv.GetImage(src)))
             
 #==============================================================

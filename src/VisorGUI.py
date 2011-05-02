@@ -102,7 +102,7 @@ class FrameVisor(wx.Frame):
         histo = wxglade_tmp_menu.Append(wx.NewId(), "Histograma", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, self.histogramaNormal, histo)
         histoAcum = wxglade_tmp_menu.Append(wx.NewId(), "Histograma Acumulativo", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.invertir, histoAcum)
+        self.Bind(wx.EVT_MENU, self.histogramaAcumulativo, histoAcum)
         #
         media = wxglade_tmp_menu.Append(wx.NewId(), "Media", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, VisorEngine.invertir, media)
@@ -149,6 +149,9 @@ class FrameVisor(wx.Frame):
 
     def histogramaNormal(self, event):
         HistFrame( ImgActual.img_gray ).Show()
+        
+    def histogramaAcumulativo(self, event):
+        HistFrame( ImgActual.img_gray, acumulativo=True ).Show()
 
 # end of class FrameVisor
 
@@ -223,7 +226,7 @@ class ImagenPopUp(wx.Frame):
 # Ventana Histograma #
 ######################
 class HistFrame(wx.Frame):
-    def __init__(self, img):
+    def __init__(self, img, acumulativo=False):
         '''
         img=imagen en PIL que se mostrará en una ventana aparte.
         '''
@@ -231,8 +234,7 @@ class HistFrame(wx.Frame):
                            title="Histograma  -  MWAHAHAHA!!", 
                            style=wx.DEFAULT_FRAME_STYLE)
         
-        (self.imgHist, self.histCV) = EngineGlobal.imhist(img)
-        #self.imgHist = wx.StaticBitmap(self, -1, wx.Bitmap("/home/erunamo/yes.jpg", wx.BITMAP_TYPE_ANY))
+        (self.imgHist, self.histCV, self.tuplaHist) = EngineGlobal.imhist(img, acumulativo)
         
         self.__lateral()
         self.__menus()
@@ -241,34 +243,37 @@ class HistFrame(wx.Frame):
         # end wxGlade
 
     def __lateral(self):
-        self.label_1 = wx.StaticText(self, -1, "Propiedades del Histograma", style=wx.ALIGN_RIGHT)
+        self.label_1 = wx.StaticText(self, -1, u"Propiedades \ndel Histograma", style=wx.ALIGN_RIGHT)
         self.panel_1 = wx.Panel(self, -1)
         self.label_2 = wx.StaticText(self, -1, u"Máximo", style=wx.ALIGN_CENTRE)
         self.maximo = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY|wx.TE_CENTRE)
-        self.label_3 = wx.StaticText(self, -1, "Minimo")
+        self.label_3 = wx.StaticText(self, -1, u"Minimo")
         self.minimo = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY|wx.TE_CENTRE)
-        self.label_4 = wx.StaticText(self, -1, "Media")
+        self.label_4 = wx.StaticText(self, -1, u"Media")
         self.media = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY|wx.TE_CENTRE)
-        self.label_5 = wx.StaticText(self, -1, u"Desviación estandar")
+        self.label_5 = wx.StaticText(self, -1, u"Desviación \nestandar")
         self.desvEstandar = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY|wx.TE_CENTRE)
         
     def __menus(self):
         # Menu Bar
         self.frame_1_menubar = wx.MenuBar()
         wxglade_tmp_menu = wx.Menu()
-        wxglade_tmp_menu.Append(wx.NewId(), "Salir", "", wx.ITEM_NORMAL)
+        salir=wxglade_tmp_menu.Append(wx.NewId(), "Salir", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, self.salir, salir)
         self.frame_1_menubar.Append(wxglade_tmp_menu, "Menu")
         self.SetMenuBar(self.frame_1_menubar)
         # Menu Bar end
         
     def __set_properties(self):
         #Datos del histograma aquí se modifican  
-        (_, _, min_idx, max_idx)=cv.GetMinMaxHistValue(self.histCV)
+        (_, _, (max_idx,), (min_idx,))=cv.GetMinMaxHistValue(self.histCV)
+        ((mean,_,_,_),(stdDev,_,_,_))=self.tuplaHist
+
         self.maximo.SetValue(unicode(max_idx))
         self.minimo.SetValue(unicode(min_idx))
-        self.media.SetValue(unicode( self.promedio() ))
-        self.desvEstandar.SetValue('04')
-
+        self.media.SetValue(unicode(mean))
+        self.desvEstandar.SetValue(unicode(stdDev))
+        self.SetMinSize((750, 390))
         
     def __do_layout(self):
         # begin wxGlade: HistFrame.__do_layout
@@ -295,10 +300,6 @@ class HistFrame(wx.Frame):
         self.Centre()
         # end wxGlade
         
-    def promedio(self):
-        suma = 0
-        for pix in range(0,255):
-            histValue = cv.QueryHistValue_1D(self.histCV, pix)
-            suma = suma + (histValue/pix)
-        return suma/255
+    def salir(self, event):
+        self.Close()
 #=================================================================     
