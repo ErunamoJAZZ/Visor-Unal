@@ -32,7 +32,7 @@ class FrameVisor(wx.Frame):
 
     def __set_properties(self):
         # begin wxGlade: wxFrame.__set_properties
-        self.SetTitle(u"Visor - Carlos Daniel Sanchez Ramirez")
+        self.SetTitle(u"Visor - Carlos Daniel Sánchez Ramírez")
         self.SetSize((400, 200))
         self.SetMinSize((400, 200))
         self.Center()
@@ -105,20 +105,20 @@ class FrameVisor(wx.Frame):
         self.Bind(wx.EVT_MENU, self.histogramaAcumulativo, histoAcum)
         #
         media = wxglade_tmp_menu.Append(wx.NewId(), "Media", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.invertir, media)
+        self.Bind(wx.EVT_MENU, EnginePDI3.media, media)
         mediana = wxglade_tmp_menu.Append(wx.NewId(), "Mediana", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.median, mediana)
+        self.Bind(wx.EVT_MENU, EnginePDI3.mediana, mediana)
         gauss = wxglade_tmp_menu.Append(wx.NewId(), "Gauss", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.invertir, gauss)
+        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, gauss)
         #
         uniforme = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Local", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.invertir, uniforme)
+        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, uniforme)
         uniforme2 = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Global", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.invertir, uniforme2)
+        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, uniforme2)
         exponencial = wxglade_tmp_menu.Append(wx.NewId(), "Exponencial", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.invertir, exponencial)
+        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, exponencial)
         rayleigh = wxglade_tmp_menu.Append(wx.NewId(), "Rayleigh", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.invertir, rayleigh)
+        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, rayleigh)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 3")
         
         #FIN

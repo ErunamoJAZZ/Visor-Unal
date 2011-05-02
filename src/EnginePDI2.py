@@ -17,7 +17,8 @@ def invertir(event):
 
 def init_umbral_bin(event):
     global def_umbral
-    dlg = wx.TextEntryDialog(None, u'Introduzca el valor máximo del umbral (El otro lo puede saignar dinamicamente)', u'Umbral Binario',  '')
+    dlg = wx.TextEntryDialog(None, u'Introduzca el valor máximo del umbral (El otro lo puede saignar dinamicamente)', 
+                             u'Umbral Binario',  '')
     if dlg.ShowModal() == wx.ID_OK:
         try:
             dato = int(dlg.GetValue() )
@@ -54,7 +55,8 @@ def suma(event):
             print(u'>> Error, introduzca un número, y Válido')    
 
 def multipli(event):   
-    dlg = wx.TextEntryDialog(None, u"Introduzca el valor a Multiplicar [2, ó 0.5 para dividir por 2]:", u'Multiplicación',  '')
+    dlg = wx.TextEntryDialog(None, u"Introduzca el valor a Multiplicar [2, ó 0.5 para dividir por 2]:", 
+                             u'Multiplicación',  '')
     if dlg.ShowModal() == wx.ID_OK:
         try:
             dato = float(dlg.GetValue() )
