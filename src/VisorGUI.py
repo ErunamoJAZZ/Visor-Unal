@@ -5,7 +5,7 @@ Created on 24/02/2011
 @author: Carlos Daniel Sanchez Ramirez <ErunamoJAZZ>
 @web: https://github.com/ErunamoJAZZ/Visor-Unal
 '''
-import wx, os
+import wx, os, cv
 import VisorEngine, EngineGlobal
 import EnginePDI1, EnginePDI2, EnginePDI3, EnginePDI4
 from EngineGlobal import ImgActual
@@ -100,7 +100,7 @@ class FrameVisor(wx.Frame):
         #PARTE 3
         wxglade_tmp_menu = wx.Menu()
         histo = wxglade_tmp_menu.Append(wx.NewId(), "Histograma", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.histograma, histo)
+        self.Bind(wx.EVT_MENU, self.histogramaNormal, histo)
         histoAcum = wxglade_tmp_menu.Append(wx.NewId(), "Histograma Acumulativo", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, VisorEngine.invertir, histoAcum)
         #
@@ -147,6 +147,8 @@ class FrameVisor(wx.Frame):
         ''' Resibe imagen en Bitmap. '''
         ImagenPopUp( imagen, umbral ).Show()
 
+    def histogramaNormal(self, event):
+        HistFrame( ImgActual.img_gray ).Show()
 
 # end of class FrameVisor
 
@@ -229,8 +231,8 @@ class HistFrame(wx.Frame):
                            title="Histograma  -  MWAHAHAHA!!", 
                            style=wx.DEFAULT_FRAME_STYLE)
         
-        #(self.imgHist, self.histCV) = VisorEngine.imhist(img)
-        self.imgHist = wx.StaticBitmap(self, -1, wx.Bitmap("/home/erunamo/yes.jpg", wx.BITMAP_TYPE_ANY))
+        (self.imgHist, self.histCV) = EngineGlobal.imhist(img)
+        #self.imgHist = wx.StaticBitmap(self, -1, wx.Bitmap("/home/erunamo/yes.jpg", wx.BITMAP_TYPE_ANY))
         
         self.__lateral()
         self.__menus()
@@ -260,28 +262,31 @@ class HistFrame(wx.Frame):
         # Menu Bar end
         
     def __set_properties(self):
-        #Datos del histograma aquí se modifican
-        self.maximo.SetValue('01')
-        self.minimo.SetValue('02')
-        self.media.SetValue('03')
+        #Datos del histograma aquí se modifican  
+        (_, _, min_idx, max_idx)=cv.GetMinMaxHistValue(self.histCV)
+        self.maximo.SetValue(unicode(max_idx))
+        self.minimo.SetValue(unicode(min_idx))
+        self.media.SetValue(unicode( self.promedio() ))
         self.desvEstandar.SetValue('04')
+
         
     def __do_layout(self):
         # begin wxGlade: HistFrame.__do_layout
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         grid_sizer_1 = wx.GridSizer(5, 2, 0, 0)
-        sizer_2.Add(self.imgHist, 0, 0, 0)
+        sizer_2.Add( wx.StaticBitmap(self, -1, EngineGlobal.pilToBitmap( self.imgHist ) ),
+                      0, 0, 0)
         grid_sizer_1.Add(self.label_1, 0, 0, 0)
         grid_sizer_1.Add(self.panel_1, 1, wx.EXPAND, 0)
         grid_sizer_1.Add(self.label_2, 0, 0, 0)
-        grid_sizer_1.Add(self.text_ctrl_1, 0, 0, 0)
+        grid_sizer_1.Add(self.maximo, 0, 0, 0)
         grid_sizer_1.Add(self.label_3, 0, 0, 0)
-        grid_sizer_1.Add(self.text_ctrl_2, 0, 0, 0)
+        grid_sizer_1.Add(self.minimo, 0, 0, 0)
         grid_sizer_1.Add(self.label_4, 0, 0, 0)
-        grid_sizer_1.Add(self.text_ctrl_3, 0, 0, 0)
+        grid_sizer_1.Add(self.media, 0, 0, 0)
         grid_sizer_1.Add(self.label_5, 0, 0, 0)
-        grid_sizer_1.Add(self.text_ctrl_4, 0, 0, 0)
+        grid_sizer_1.Add(self.desvEstandar, 0, 0, 0)
         sizer_2.Add(grid_sizer_1, 1, wx.EXPAND, 0)
         sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
         self.SetSizer(sizer_1)
@@ -289,5 +294,11 @@ class HistFrame(wx.Frame):
         self.Layout()
         self.Centre()
         # end wxGlade
-
+        
+    def promedio(self):
+        suma = 0
+        for pix in range(0,255):
+            histValue = cv.QueryHistValue_1D(self.histCV, pix)
+            suma = suma + (histValue/pix)
+        return suma/255
 #=================================================================     
