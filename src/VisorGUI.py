@@ -6,7 +6,9 @@ Created on 24/02/2011
 @web: https://github.com/ErunamoJAZZ/Visor-Unal
 '''
 import wx, os
-import VisorEngine
+import VisorEngine, EngineGlobal
+import EnginePDI1, EnginePDI2, EnginePDI3, EnginePDI4
+from EngineGlobal import ImgActual
 
 
 class FrameVisor(wx.Frame):
@@ -18,7 +20,7 @@ class FrameVisor(wx.Frame):
         self.panel_imagen1 = wx.Panel(self.notebook_imagenes, -1)
         self.panel_para_img = wx.Panel(self.panel_imagen1, -1)
         self.bitmap_1 = wx.StaticBitmap(self.panel_para_img, -1)
-        VisorEngine.loadAll(self)
+        ImgActual.SetPadre(self)
         
         # Menu Bar
         self.__barra_de_menu()
@@ -57,7 +59,7 @@ class FrameVisor(wx.Frame):
         self.frame_del_visor_menubar = wx.MenuBar()
         wxglade_tmp_menu = wx.Menu()
         abrir = wxglade_tmp_menu.Append(wx.NewId(), "Abrir", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.openImage, abrir)
+        self.Bind(wx.EVT_MENU, ImgActual.openImage, abrir)
         salir = wxglade_tmp_menu.Append(wx.NewId(), "Salir", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, self.salir, salir)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Archivo")
@@ -66,36 +68,36 @@ class FrameVisor(wx.Frame):
         #PARTE 1
         wxglade_tmp_menu = wx.Menu()
         gris = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> Grises", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.rgb2grises, gris)
+        self.Bind(wx.EVT_MENU, EnginePDI1.rgb2grises, gris)
         r = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> R", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.rgb2r, r)
+        self.Bind(wx.EVT_MENU, EnginePDI1.rgb2r, r)
         g = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> G", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.rgb2g, g)
+        self.Bind(wx.EVT_MENU, EnginePDI1.rgb2g, g)
         b = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> B", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.rgb2b, b)
+        self.Bind(wx.EVT_MENU, EnginePDI1.rgb2b, b)
         hsi = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> HSI", "", wx.ITEM_NORMAL)
         
         rgb = wxglade_tmp_menu.Append(wx.NewId(), "HSI -> RGB", "", wx.ITEM_NORMAL)
         
-        self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros")
+        self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 1")
         
         
         #PARTE 2
         wxglade_tmp_menu = wx.Menu()
         invertir = wxglade_tmp_menu.Append(wx.NewId(), "Invertit grises", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.invertir, invertir)
+        self.Bind(wx.EVT_MENU, EnginePDI2.invertir, invertir)
         umbral = wxglade_tmp_menu.Append(wx.NewId(), "Umbral", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.init_umbral, umbral)
+        self.Bind(wx.EVT_MENU, EnginePDI2.init_umbral, umbral)
         umbral_bin = wxglade_tmp_menu.Append(wx.NewId(), "Umbral binario", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.init_umbral_bin, umbral_bin)
+        self.Bind(wx.EVT_MENU, EnginePDI2.init_umbral_bin, umbral_bin)
         sum = wxglade_tmp_menu.Append(wx.NewId(), "Suma/resta", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.suma, sum)
+        self.Bind(wx.EVT_MENU, EnginePDI2.suma, sum)
         mult = wxglade_tmp_menu.Append(wx.NewId(), u"Multiplicación/División", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.multipli, mult)
+        self.Bind(wx.EVT_MENU, EnginePDI2.multipli, mult)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 2")
         
         
-        #PARTE3
+        #PARTE 3
         wxglade_tmp_menu = wx.Menu()
         histo = wxglade_tmp_menu.Append(wx.NewId(), "Histograma", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, VisorEngine.histograma, histo)
@@ -135,12 +137,15 @@ class FrameVisor(wx.Frame):
         self.Close()
         
     def cargarImg(self, img):
+        ''' Recibe img como Bitmap. ''' 
         self.bitmap_1.SetBitmap(img)
         self.SetSize(self.bitmap_1.GetSizeTuple())
         self.Center()
+        ImgActual.SetImagenActual(EngineGlobal.bitmapToPil( img ))
         
-    def mostrarFiltro(self, imagen, imagen_PIL, umbral=False):
-        ImagenPopUp( imagen, imagen_PIL, umbral ).Show()
+    def mostrarFiltro(self, imagen, umbral=False):
+        ''' Resibe imagen en Bitmap. '''
+        ImagenPopUp( imagen, umbral ).Show()
 
 
 # end of class FrameVisor
@@ -149,7 +154,7 @@ class FrameVisor(wx.Frame):
 # Imagen de filtro #
 ####################
 class ImagenPopUp(wx.Frame):
-    def __init__(self, img, img_PIL, slider=False):
+    def __init__(self, img, slider=False):
         '''
         img=imagen en bitmap que se mostrará en una ventana aparte.
         '''
@@ -157,7 +162,7 @@ class ImagenPopUp(wx.Frame):
                            title="imagen  -  MWAHAHAHA!!", 
                            style=wx.DEFAULT_FRAME_STYLE)
 
-        self.img_PIL = img_PIL
+        
         self.bitmap_1 = wx.StaticBitmap(self, -1 , img)
         x,y = self.bitmap_1.GetSizeTuple()
         self.SetMinSize( (x,y+70) )
@@ -180,6 +185,8 @@ class ImagenPopUp(wx.Frame):
         wxglade_tmp_menu = wx.Menu()
         save = wxglade_tmp_menu.Append(wx.NewId(), "Guardar", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, self.saveImagen, save)
+        load = wxglade_tmp_menu.Append(wx.NewId(), "Cargar como imagen principal", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, self.loadImgPrincipal, load)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Archivo")
 
         self.SetMenuBar(self.frame_del_visor_menubar)
@@ -192,7 +199,7 @@ class ImagenPopUp(wx.Frame):
         '''
         Hace los cambios en la imagen, devuelve un bitmap, y lo actualiza.
         '''
-        self.bitmap_1.SetBitmap( VisorEngine.umbral( self.slid.GetValue() )  )
+        self.bitmap_1.SetBitmap( EnginePDI2.umbral( self.slid.GetValue() )  )
         
     def saveImagen(self,event):        
         dlg = wx.FileDialog(None, message="Guarde la imagen",
@@ -200,45 +207,87 @@ class ImagenPopUp(wx.Frame):
                         style=wx.SAVE | wx.CHANGE_DIR )
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            self.img_PIL.save( unicode( path.replace('\\','/')  )  )
+            EngineGlobal.bitmapToPil( self.bitmap_1.GetBitmap() ).save( unicode( path.replace('\\','/')  )  )
             dlg.Destroy()
-        
-        
+    
+    def loadImgPrincipal(self, event):
+        '''Carga la imagen de esta ventana como principal, y luego cierra esta. ''' 
+        wx.GetApp().TopWindow.cargarImg( self.bitmap_1.GetBitmap() )#EngineGlobal.pilToBitmap(self.img_PIL) )
+        self.Close()
+
+
+
 ######################
 # Ventana Histograma #
 ######################
-class HistogramPopUp(wx.Frame):
+class HistFrame(wx.Frame):
     def __init__(self, img):
         '''
-        img=imagen en openCV que se mostrará en una ventana aparte.
+        img=imagen en PIL que se mostrará en una ventana aparte.
         '''
         wx.Frame.__init__(self, wx.GetApp().TopWindow,
                            title="Histograma  -  MWAHAHAHA!!", 
                            style=wx.DEFAULT_FRAME_STYLE)
+        
+        #(self.imgHist, self.histCV) = VisorEngine.imhist(img)
+        self.imgHist = wx.StaticBitmap(self, -1, wx.Bitmap("/home/erunamo/yes.jpg", wx.BITMAP_TYPE_ANY))
+        
+        self.__lateral()
+        self.__menus()
+        self.__set_properties()
+        self.__do_layout()
+        # end wxGlade
 
-        self.bitmap_1 = wx.StaticBitmap(self, -1 , VisorEngine.imhist(img) )
-        x,y = self.bitmap_1.GetSizeTuple()
-        self.SetMinSize( (x,y+70) )
-        self.Center()
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_1.Add(self.bitmap_1, 0, 0, 0)
+    def __lateral(self):
+        self.label_1 = wx.StaticText(self, -1, "Propiedades del Histograma", style=wx.ALIGN_RIGHT)
+        self.panel_1 = wx.Panel(self, -1)
+        self.label_2 = wx.StaticText(self, -1, u"Máximo", style=wx.ALIGN_CENTRE)
+        self.maximo = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY|wx.TE_CENTRE)
+        self.label_3 = wx.StaticText(self, -1, "Minimo")
+        self.minimo = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY|wx.TE_CENTRE)
+        self.label_4 = wx.StaticText(self, -1, "Media")
+        self.media = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY|wx.TE_CENTRE)
+        self.label_5 = wx.StaticText(self, -1, u"Desviación estandar")
+        self.desvEstandar = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY|wx.TE_CENTRE)
         
-        
-        self.__barra_de_menu()
-        self.SetSizer(sizer_1)
-        self.Layout()
-        
-    def __barra_de_menu(self):
+    def __menus(self):
         # Menu Bar
-        self.frame_del_visor_menubar = wx.MenuBar()
+        self.frame_1_menubar = wx.MenuBar()
         wxglade_tmp_menu = wx.Menu()
-        save = wxglade_tmp_menu.Append(wx.NewId(), "Guardar", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, VisorEngine.saveImagen, save)
-        self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Archivo")
-
-        self.SetMenuBar(self.frame_del_visor_menubar)
-        # Menu Bar end    
-    
-
+        wxglade_tmp_menu.Append(wx.NewId(), "Salir", "", wx.ITEM_NORMAL)
+        self.frame_1_menubar.Append(wxglade_tmp_menu, "Menu")
+        self.SetMenuBar(self.frame_1_menubar)
+        # Menu Bar end
         
+    def __set_properties(self):
+        #Datos del histograma aquí se modifican
+        self.maximo.SetValue('01')
+        self.minimo.SetValue('02')
+        self.media.SetValue('03')
+        self.desvEstandar.SetValue('04')
         
+    def __do_layout(self):
+        # begin wxGlade: HistFrame.__do_layout
+        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
+        grid_sizer_1 = wx.GridSizer(5, 2, 0, 0)
+        sizer_2.Add(self.imgHist, 0, 0, 0)
+        grid_sizer_1.Add(self.label_1, 0, 0, 0)
+        grid_sizer_1.Add(self.panel_1, 1, wx.EXPAND, 0)
+        grid_sizer_1.Add(self.label_2, 0, 0, 0)
+        grid_sizer_1.Add(self.text_ctrl_1, 0, 0, 0)
+        grid_sizer_1.Add(self.label_3, 0, 0, 0)
+        grid_sizer_1.Add(self.text_ctrl_2, 0, 0, 0)
+        grid_sizer_1.Add(self.label_4, 0, 0, 0)
+        grid_sizer_1.Add(self.text_ctrl_3, 0, 0, 0)
+        grid_sizer_1.Add(self.label_5, 0, 0, 0)
+        grid_sizer_1.Add(self.text_ctrl_4, 0, 0, 0)
+        sizer_2.Add(grid_sizer_1, 1, wx.EXPAND, 0)
+        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
+        self.SetSizer(sizer_1)
+        sizer_1.Fit(self)
+        self.Layout()
+        self.Centre()
+        # end wxGlade
+
+#=================================================================     

@@ -1,5 +1,10 @@
-#Tue Mar 01 11:35:14 COT 2011
+#Sun May 01 18:18:21 COT 2011
 eclipse.preferences.version=1
+encoding//src/EngineGlobal.py=utf-8
+encoding//src/EnginePDI1.py=utf-8
+encoding//src/EnginePDI2.py=utf-8
+encoding//src/EnginePDI3.py=utf-8
+encoding//src/EnginePDI4.py=utf-8
 encoding//src/VisorEngine.py=utf-8
 encoding//src/VisorGUI.py=utf-8
 encoding//src/VisorMain.py=utf-8

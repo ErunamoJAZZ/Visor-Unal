@@ -36,23 +36,11 @@ def openImage(event):
         padre.cargarImg(pilToBitmap( img ))
         img_gray = img.convert('L')
 
-def saveImagen(event):
-    global img_out
-    dlg = wx.FileDialog(None, message="Guarde la imagen",
-                        defaultDir=os.getcwd(), defaultFile="",
-                        style=wx.SAVE | wx.CHANGE_DIR )
-    if dlg.ShowModal() == wx.ID_OK:
-        path = dlg.GetPath()
-        img_out.save( unicode( path.replace('\\','/')  )  )
-        dlg.Destroy()
-
-
 
 #--Filtros
 def rgb2grises(event):
-    global img_out
     img_out = img.convert('L')
-    padre.mostrarFiltro( pilToBitmap( img_out ), img_out  )
+    padre.mostrarFiltro( pilToBitmap( img_out )  )
     
 def rgb2r(event):
     global img_out
@@ -174,25 +162,13 @@ def median(event):
 '''
 Pseudo implementación de la función imhist() de matlab.
 '''
-def hist(imgPIL):
-    rangos = [[0,255]]
-    hist = cv.CreateHist([256], cv.CV_HIST_ARRAY, rangos, 1)
-    
-    #pasar de pil a cv
-    src= pil2cv_L(imgPIL)
-        
-    #calculando el histograma
-    cv.CalcHist([cv.GetImage(src)] , hist, 0)  
-    
-    return hist  
-    
 def imhist(imgPIL):
     '''
-    Resibe la imagen a escala de grises de tipo PIL(Python Image Library)
+    imhist(imgPIL) -> (histImgPIL, histCV)
+    Resibe una imagen tipo PIL, y retorna una Tupla.
+    Donde histImPIL es la imagen del histograma,
+    y histCV es el histograma crudo que hace OpenCV.
     '''
-    #crear el histograma base.
-
-    hist = hist(imgPIL)
     
     def drawHistogram(histograma, scaleX=1.0, scaleY=1.0):
         '''
@@ -225,8 +201,20 @@ def imhist(imgPIL):
         
         #finalmente, se retorna la imagen(imgCV) del histograma ya dibujado.    
         return imgHist
+    #===================
+    #creación del histograma vacío (es como un array)
+    rangos = [[0,255]]
+    hist = cv.CreateHist([256], cv.CV_HIST_ARRAY, rangos, 1)
     
-    return cv2pil( drawHistogram(hist,3,3) )        
+    #pasar de pil a cv
+    src= pil2cv_L(imgPIL)
+        
+    #calculando el histograma
+    cv.CalcHist([cv.GetImage(src)] , hist, 0)  
+    
+    #=== FINAL ===
+    #retorna Tupla (imgPIL, histCV)
+    return (cv2pil( drawHistogram(hist,2,5) ), hist)
             
 #==============================================================
 
