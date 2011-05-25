@@ -112,14 +112,25 @@ class FrameVisor(wx.Frame):
         self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, gauss)
         #
         uniforme = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Local", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, uniforme)
+        #self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, uniforme)
         uniforme2 = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Global", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, uniforme2)
+        #self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, uniforme2)
         exponencial = wxglade_tmp_menu.Append(wx.NewId(), "Exponencial", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, exponencial)
+        #self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, exponencial)
         rayleigh = wxglade_tmp_menu.Append(wx.NewId(), "Rayleigh", "", wx.ITEM_NORMAL)
-        self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, rayleigh)
+        #self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, rayleigh)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 3")
+        
+        #PDI4
+        wxglade_tmp_menu = wx.Menu()
+        sobel = wxglade_tmp_menu.Append(wx.NewId(), "Sobel", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, EnginePDI4.sobel, sobel)
+        roberts = wxglade_tmp_menu.Append(wx.NewId(), "Roberts", "", wx.ITEM_NORMAL)
+        #self.Bind(wx.EVT_MENU, EnginePDI4., roberts)
+        canny = wxglade_tmp_menu.Append(wx.NewId(), "Canny", "", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, EnginePDI4.canny, canny)
+        #Blobs y eso, no los pude implementar u.u
+        self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 4")
         
         #FIN
         wxglade_tmp_menu = wx.Menu()
@@ -208,7 +219,7 @@ class ImagenPopUp(wx.Frame):
         
     def saveImagen(self,event):        
         dlg = wx.FileDialog(None, message="Guarde la imagen",
-                        defaultDir=os.getcwd(), defaultFile="",
+                        defaultDir=os.path.expanduser('~'), defaultFile="",
                         style=wx.SAVE | wx.CHANGE_DIR )
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()

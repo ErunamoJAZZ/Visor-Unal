@@ -28,7 +28,7 @@ class ImagenActual():
    
     def openImage(self, event):
         dlg = wx.FileDialog(None, message=u"Seleccione un archivo de texto",
-                                    defaultDir=os.getcwd(), defaultFile=".txt",
+                                    defaultDir=os.path.expanduser('~'), defaultFile=".txt",
                                     style=wx.OPEN | wx.CHANGE_DIR )
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -82,7 +82,7 @@ def imageToBitmap(image):
 PIL Image to OpenCV
 '''
 def pil2cv_L(imgPIL):
-    imgCV = cv.CreateImageHeader(imgPIL.size, cv.IPL_DEPTH_8U, 1)
+    imgCV = cv.CreateImageHeader(imgPIL.size,cv.IPL_DEPTH_8U , 1)#cv.IPL_DEPTH_32F
     cv.SetData(imgCV, imgPIL.tostring() )
     return imgCV
 
