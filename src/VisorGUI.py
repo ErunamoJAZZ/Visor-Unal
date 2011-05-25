@@ -75,9 +75,9 @@ class FrameVisor(wx.Frame):
         self.Bind(wx.EVT_MENU, EnginePDI1.rgb2g, g)
         b = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> B", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, EnginePDI1.rgb2b, b)
-        hsi = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> HSI", "", wx.ITEM_NORMAL)
+        #hsi = wxglade_tmp_menu.Append(wx.NewId(), "RGB -> HSI", "", wx.ITEM_NORMAL)
         
-        rgb = wxglade_tmp_menu.Append(wx.NewId(), "HSI -> RGB", "", wx.ITEM_NORMAL)
+        #rgb = wxglade_tmp_menu.Append(wx.NewId(), "HSI -> RGB", "", wx.ITEM_NORMAL)
         
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 1")
         
@@ -111,13 +111,13 @@ class FrameVisor(wx.Frame):
         gauss = wxglade_tmp_menu.Append(wx.NewId(), "Gauss", "", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, gauss)
         #
-        uniforme = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Local", "", wx.ITEM_NORMAL)
+        #uniforme = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Local", "", wx.ITEM_NORMAL)
         #self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, uniforme)
-        uniforme2 = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Global", "", wx.ITEM_NORMAL)
+        #uniforme2 = wxglade_tmp_menu.Append(wx.NewId(), "Uniforme Global", "", wx.ITEM_NORMAL)
         #self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, uniforme2)
-        exponencial = wxglade_tmp_menu.Append(wx.NewId(), "Exponencial", "", wx.ITEM_NORMAL)
+        #exponencial = wxglade_tmp_menu.Append(wx.NewId(), "Exponencial", "", wx.ITEM_NORMAL)
         #self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, exponencial)
-        rayleigh = wxglade_tmp_menu.Append(wx.NewId(), "Rayleigh", "", wx.ITEM_NORMAL)
+        #rayleigh = wxglade_tmp_menu.Append(wx.NewId(), "Rayleigh", "", wx.ITEM_NORMAL)
         #self.Bind(wx.EVT_MENU, EnginePDI3.guassiano, rayleigh)
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 3")
         
@@ -133,9 +133,7 @@ class FrameVisor(wx.Frame):
         self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "Filtros 4")
         
         #FIN
-        wxglade_tmp_menu = wx.Menu()
-        wxglade_tmp_menu.Append(wx.NewId(), "Acerca de...", "", wx.ITEM_NORMAL)
-        self.frame_del_visor_menubar.Append(wxglade_tmp_menu, "...")
+
         
         self.SetMenuBar(self.frame_del_visor_menubar)
         # Menu Bar end
